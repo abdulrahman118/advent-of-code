@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyConsole.AOC2020
 {
@@ -16,11 +14,11 @@ namespace MyConsole.AOC2020
             // Part 1 - 1217.
             RunInstructions(input);
 
-            // Part 2 - to do.
+            // Part 2 - 501.
             RunInstructions2(input);
         }
 
-        private static void RunInstructions(string[] input)
+        private static int RunInstructions(string[] input)
         {
             int step = 0;
             int accumulator = 0;
@@ -57,25 +55,74 @@ namespace MyConsole.AOC2020
                     break;
                 }
             } while (step < input.Length);
+
+            Console.WriteLine($"accumulator: {accumulator}");
+
+            return step;
         }
 
         private static void RunInstructions2(string[] input)
         {
-            int step = 0;
-            int accumulator = 0;
-            var executedSteps = new List<int>();
+            int step = 0;            
 
             int jumpCount = input.Where(i => i.StartsWith("jmp")).Count();
             int noOpCount = input.Where(i => i.StartsWith("nop")).Count();
 
-            int jumpReplaceCount = jumpCount;
-            int noOpReplaceCount = noOpCount;
-            //input = File.ReadAllLines(@"D:\Input.txt");
+            int jumpReplaceCount = 0;
+            int noOpReplaceCount = 0;
+
             do
             {
-                //input.Where(i => i.StartsWith("jmp")).
+                input = File.ReadAllLines(@"D:\Input.txt");
 
-            } while (jumpReplaceCount > jumpCount || noOpReplaceCount > noOpCount);
+                if (jumpReplaceCount < jumpCount)
+                {
+                    int count = 0;
+                    for (int i = 0; i < input.Length; i++)
+                    {
+                        if (input[i].StartsWith("jmp"))
+                        {
+                            if (count == jumpReplaceCount)
+                            {
+                                input[i] = input[i].Replace("jmp", "nop");
+                                jumpReplaceCount++;
+                                break;
+                            }
+
+                            count++;
+                        }
+                    }
+
+                }
+                else if (noOpReplaceCount < noOpCount)
+                {
+                    int count = 0;
+                    for (int i = 0; i < input.Length; i++)
+                    {
+                        if (input[i].StartsWith("nop"))
+                        {
+                            if (count == noOpReplaceCount)
+                            {
+                                input[i] = input[i].Replace("nop", "jmp");
+                                noOpReplaceCount++;
+                                break;
+                            }
+
+                            count++;
+                        }
+                    }
+                }
+
+                step = RunInstructions(input);
+
+                Console.WriteLine($"Step: {step}");
+
+                if (jumpReplaceCount == jumpCount && noOpReplaceCount == noOpCount)
+                {
+                    break;
+                }
+
+            } while (step < (input.Length - 1));
 
             Console.WriteLine($"step: {step}, instructions count {input.Length}");
         }
